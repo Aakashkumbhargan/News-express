@@ -17,15 +17,15 @@
 
 svg {
   font-family: "Poller One", sans-serif;
-  width: 200px;
-  height: 45px;
+  width: 21rem;
+  height: 3rem;
 }
 
 svg text {
   animation: stroke 5s infinite alternate;
   /* stroke-width: 2; */
   stroke: #5EA092;
-  font-size: 40px;
+  font-size: 44px;
 }
 
 @keyframes stroke {

@@ -1,36 +1,42 @@
 import React, { useEffect, useState } from 'react';
 import { getNews, getSearchNews } from './api.js';
+import { useDebounce } from './useDebounce.js';
 import './index.css';
 
 function App() {
   const [articles, setArticles] = useState([]);
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
+  const debouncedSearch = useDebounce(search, 500); // 500ms delay
 
   useEffect(() => {
-    setMessage('Loading...');
-    getNews().then(data => {
-      setArticles(data?.articles || []);
-      setMessage('');
-    });
-  }, []);
+    const fetchArticles = async () => {
+      setMessage('Loading...');
+      setArticles([]);
+      try {
+        const data = debouncedSearch
+          ? await getSearchNews(debouncedSearch)
+          : await getNews();
+
+        const fetchedArticles = data?.articles || [];
+        setArticles(fetchedArticles);
+
+        if (fetchedArticles.length === 0) {
+          setMessage(debouncedSearch ? 'No articles found for your search.' : 'No top headlines found.');
+        } else {
+          setMessage('');
+        }
+      } catch (error) {
+        // The error is already logged in api.js
+        setMessage('Failed to fetch news. Please check your connection or API key.');
+      }
+    };
+
+    fetchArticles();
+  }, [debouncedSearch]);
 
   const handleSearch = (event) => {
-    const value = event.target.value;
-    setSearch(value);
-    setArticles([]);
-    setMessage('Loading...');
-    if (value === '') {
-      getNews().then(data => {
-        setArticles(data?.articles || []);
-        setMessage('');
-      });
-    } else {
-      getSearchNews(value).then(data => {
-        setArticles(data?.articles || []);
-        setMessage('');
-      });
-    }
+    setSearch(event.target.value);
   };
 
   return (
@@ -40,7 +46,7 @@ function App() {
         <div className="header-wrapper">
           <svg>
             <text x="50%" y="50%" dy=".35em" text-anchor="middle">
-              News First
+              News infoblitz
             </text>
           </svg>
           <input

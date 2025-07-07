@@ -8,6 +8,10 @@ if (!APIKEY) {
 export async function getNews() {
     try {
         const response = await fetch(`${BASE_URL}/top-headlines?country=us&apiKey=${APIKEY}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
         return response.json();
     } catch (error) {
         console.error(error);
@@ -18,6 +22,10 @@ export async function getNews() {
 export async function getSearchNews(query) {
     try {
         const response = await fetch(`${BASE_URL}/everything?q=${query}&apiKey=${APIKEY}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
         return response.json();
     } catch (error) {
         console.error(error);
